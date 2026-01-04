@@ -160,7 +160,7 @@ class _HomePageHeaderState extends State<HomePageHeader>
                           //   ),
                           // ),
                           Image.asset(
-                            "assets/images/dev_meditate.gif",
+                            "assets/images/adh.png",
                             width: screenWidth,
                           ),
                         ],
@@ -202,7 +202,7 @@ class _HomePageHeaderState extends State<HomePageHeader>
                       child: Stack(
                         children: [
                           Image.asset(
-                            "assets/images/dev_meditate.gif",
+                            "assets/images/adh.png",
                             width: screenWidth * .4,
                           ),
                         ],

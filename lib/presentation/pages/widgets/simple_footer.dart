@@ -77,26 +77,26 @@ class SimpleFooterSm extends StatelessWidget {
           ],
         ),
         SpaceH12(),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            InkWell(
-              onTap: () {
-                Functions.launchUrl(StringConst.DESIGN_LINK);
-              },
-              child: AnimatedLineThroughText(
-                text: StringConst.DESIGNED_BY,
-                isUnderlinedByDefault: true,
-                isUnderlinedOnHover: false,
-                hoverColor: AppColors.white,
-                coverColor: AppColors.black,
-                textStyle: style?.copyWith(
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
-          ],
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     InkWell(
+        //       onTap: () {
+        //         Functions.launchUrl(StringConst.DESIGN_LINK);
+        //       },
+        //       child: AnimatedLineThroughText(
+        //         text: StringConst.DESIGNED_BY,
+        //         isUnderlinedByDefault: true,
+        //         isUnderlinedOnHover: false,
+        //         hoverColor: AppColors.white,
+        //         coverColor: AppColors.black,
+        //         textStyle: style?.copyWith(
+        //           decoration: TextDecoration.underline,
+        //         ),
+        //       ),
+        //     ),
+        //   ],
+        // ),
         SpaceH8(),
         BuiltWithFlutter(),
       ],
@@ -131,21 +131,21 @@ class SimpleFooterLg extends StatelessWidget {
               style: style,
             ),
             SpaceW8(),
-            InkWell(
-              onTap: () {
-                Functions.launchUrl(StringConst.DESIGN_LINK);
-              },
-              child: AnimatedLineThroughText(
-                text: StringConst.DESIGNED_BY,
-                isUnderlinedByDefault: true,
-                isUnderlinedOnHover: false,
-                hoverColor: AppColors.white,
-                coverColor: AppColors.black,
-                textStyle: style?.copyWith(
-                  decoration: TextDecoration.underline,
-                ),
-              ),
-            ),
+            // InkWell(
+            //   onTap: () {
+            //     Functions.launchUrl(StringConst.DESIGN_LINK);
+            //   },
+            //   child: AnimatedLineThroughText(
+            //     text: StringConst.DESIGNED_BY,
+            //     isUnderlinedByDefault: true,
+            //     isUnderlinedOnHover: false,
+            //     hoverColor: AppColors.white,
+            //     coverColor: AppColors.black,
+            //     textStyle: style?.copyWith(
+            //       decoration: TextDecoration.underline,
+            //     ),
+            //   ),
+            // ),
           ],
         ),
         SpaceH8(),
