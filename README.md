@@ -1,16 +1,60 @@
-# ahmadportfolio
+<h1 align="center">
+  <a href="https://ahmadeja-z.github.io/ahmadportfolio/" target="_blank">
+    ahmadportfolio
+  </a>
+</h1>
 
-A new Flutter project.
+<p align="center">
+  This repository contains the source code for my personal portfolio website built using Flutter Web.
+</p>
 
-## Getting Started
+<p align="center">
+  The portfolio showcases my projects, skills, and experience, and is designed with a clean, responsive, and modern UI.
+</p>
 
-This project is a starting point for a Flutter application.
+<p align="center">
+  Live demo:
+  <a href="https://ahmadeja-z.github.io/ahmadportfolio/#/home" target="_blank">
+    https://ahmadeja-z.github.io/ahmadportfolio
+  </a>
+</p>
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 🚀 Tech Stack
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- **Flutter (Web)**
+- **Dart**
+- **Material UI**
+- **Responsive Layout (layout package)**
+- **GitHub Pages (Deployment)**
+
+---
+
+## 🌐 Routing Note (Important)
+
+This portfolio uses **hash-based routing** (`#/home`) to ensure compatibility with **GitHub Pages**.
+
+Direct path-based URLs like `/home` will not work on reload due to static hosting limitations.
+
+---
+
+## 🚨 Forking this repo (please read!)
+
+I keep this project **open source** for learning and inspiration.  
+However, please understand that **plagiarism is not acceptable**.
+
+A significant amount of time and effort went into designing and developing this portfolio, and I am proud of the result.
+
+
+Please include a visible credit link to:
+
+👉 **https://ahmadeja-z.github.io/ahmadportfolio/**
+
+---
+
+## 🛠️ Local Development
+
+```bash
+flutter pub get
+flutter run -d chrome
