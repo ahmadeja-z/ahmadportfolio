@@ -58,6 +58,33 @@
   }
 </script>
 
+<!-- GitHub Pages SPA redirect handler -->
+<!-- This script handles the 404.html redirect and restores the original path -->
+<script type="text/javascript">
+  // Single Page Apps for GitHub Pages
+  // Source: https://github.com/rafgraph/spa-github-pages
+  (function() {
+    var pathSegmentsToKeep = 0;
+    var l = window.location;
+    
+    // Check if we have a redirect query string from 404.html
+    if (l.search[1] === '/' ) {
+      var decoded = l.search.slice(1).split('&').map(function(s) { 
+        return s.replace(/~and~/g, '&')
+      }).join('?');
+      
+      // Extract the path from the query string
+      var path = decoded.replace(/\?.*$/, '');
+      
+      // Update the URL to use the path instead of query string
+      window.history.replaceState(null, null,
+        l.pathname.slice(0, -1).split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/' + path +
+        l.hash
+      );
+    }
+  })();
+</script>
+
 <!-- Flutter Web App -->
 <script src="main.dart.js" type="application/javascript"></script>
 

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "888364069094",
+    "project_id": "ahmadportfolio-244623",
+    "storage_bucket": "ahmadportfolio-244623.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:888364069094:android:dbd8fa02fef82db9cfcb27",
+        "android_client_info": {
+          "package_name": "com.example.ahmadportfolio"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3S3ZQBq2c9Yxzk-Xq3xexYgx857pDWds"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

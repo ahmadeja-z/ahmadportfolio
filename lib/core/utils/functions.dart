@@ -8,6 +8,12 @@ class Functions {
     await launch(url);
   }
 
+  /// Generates a URL-friendly slug from a project title
+  /// Example: "DelthoLotto" -> "deltholotto"
+  static String generateProjectSlug(String title) {
+    return title.toLowerCase().replaceAll(' ', '-').replaceAll(RegExp(r'[^a-z0-9-]'), '');
+  }
+
   static Size textSize({
     required String text,
     required TextStyle? style,
@@ -36,8 +42,13 @@ class Functions {
       hasNextProject = true;
       nextProject = dataSource[currentProjectIndex + 1];
     }
+    
+    // Generate slug from project title for URL
+    String projectSlug = generateProjectSlug(currentProject.title);
+    String routeWithSlug = '${ProjectDetailPage.projectDetailPageRoute}/$projectSlug';
+    
     Navigator.of(context).pushNamed(
-      ProjectDetailPage.projectDetailPageRoute,
+      routeWithSlug,
       arguments: ProjectDetailArguments(
         dataSource: dataSource,
         currentIndex: currentProjectIndex,

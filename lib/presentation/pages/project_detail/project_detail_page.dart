@@ -2,6 +2,7 @@ import 'package:ahmadportfolio/core/layout/adaptive.dart';
 import 'package:ahmadportfolio/core/utils/functions.dart';
 import 'package:ahmadportfolio/presentation/pages/project_detail/widgets/about_project.dart';
 import 'package:ahmadportfolio/presentation/pages/project_detail/widgets/next_project.dart';
+import 'package:ahmadportfolio/presentation/pages/home/home_page.dart';
 import 'package:ahmadportfolio/presentation/pages/widgets/simple_footer.dart';
 import 'package:ahmadportfolio/presentation/widgets/animated_text_slide_box_transition.dart';
 import 'package:ahmadportfolio/presentation/widgets/animated_wave.dart';
@@ -12,6 +13,7 @@ import 'package:ahmadportfolio/presentation/widgets/page_wrapper.dart';
 import 'package:ahmadportfolio/presentation/widgets/project_item.dart';
 import 'package:ahmadportfolio/presentation/widgets/spaces.dart';
 import 'package:ahmadportfolio/values/values.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -86,9 +88,86 @@ class _ProjectDetailPageState extends State<ProjectDetailPage>
   }
 
   ProjectDetailArguments getArguments() {
-    projectDetails =
-        ModalRoute.of(context)!.settings.arguments as ProjectDetailArguments;
-    return projectDetails;
+    final routeSettings = ModalRoute.of(context)!.settings;
+    Object? routeArguments = routeSettings.arguments;
+    
+    // First, try to extract slug from route name (for direct URL access)
+    String? slug;
+    if (kIsWeb && routeSettings.name != null) {
+      final routeName = routeSettings.name!;
+      final slugMatch = RegExp(r'/project-detail/([\w-]+)$').firstMatch(routeName);
+      if (slugMatch != null) {
+        slug = slugMatch.group(1);
+      }
+    }
+    
+    // Second, check if we have direct ProjectDetailArguments (from app navigation)
+    if (routeArguments != null && routeArguments is ProjectDetailArguments) {
+      projectDetails = routeArguments;
+      return projectDetails;
+    }
+    
+    // Third, if arguments is wrapped in a map (from route handler), unwrap it
+    if (routeArguments is Map<String, dynamic>) {
+      // Check if we have original arguments (from app navigation with slug)
+      if (routeArguments.containsKey('originalArguments') && 
+          routeArguments['originalArguments'] is ProjectDetailArguments) {
+        projectDetails = routeArguments['originalArguments'] as ProjectDetailArguments;
+        return projectDetails;
+      }
+      
+      // Check if we have a slug in arguments (fallback to route name slug)
+      String? slugFromArgs = routeArguments['slug'] as String?;
+      if (slugFromArgs != null && slugFromArgs.isNotEmpty) {
+        slug = slugFromArgs;
+      }
+    }
+    
+    // If we have a slug (from route name or arguments), try to find project
+    if (kIsWeb && slug != null && slug.isNotEmpty) {
+      final allProjects = Data.projects;
+      
+      // Find project by slug
+      ProjectItemData? projectBySlug;
+      int? projectIndex;
+      
+      for (int i = 0; i < allProjects.length; i++) {
+        String projectSlug = Functions.generateProjectSlug(allProjects[i].title);
+        if (projectSlug == slug) {
+          projectBySlug = allProjects[i];
+          projectIndex = i;
+          break;
+        }
+      }
+      
+      // If project found by slug, create arguments
+      if (projectBySlug != null && projectIndex != null) {
+        ProjectItemData? nextProject;
+        bool hasNextProject = (projectIndex + 1) < allProjects.length;
+        if (hasNextProject) {
+          nextProject = allProjects[projectIndex + 1];
+        }
+        
+        projectDetails = ProjectDetailArguments(
+          dataSource: allProjects,
+          currentIndex: projectIndex,
+          data: projectBySlug,
+          nextProject: nextProject,
+          hasNextProject: hasNextProject,
+        );
+        return projectDetails;
+      }
+    }
+    
+    // If no valid arguments found, redirect to home
+    if (kIsWeb) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed(HomePage.homePageRoute);
+      });
+    }
+    
+    // Return a dummy value (should not reach here)
+    throw Exception('Project not found');
   }
 
   @override

@@ -54,7 +54,8 @@ class RouteConfiguration {
       (context, matches) => const WorksPage(),
     ),
     Path(
-      r'^' + ProjectDetailPage.projectDetailPageRoute,
+      // Match /project-detail or /project-detail/:slug
+      r'^' + ProjectDetailPage.projectDetailPageRoute + r'(?:/([\w-]+))?$',
       (context, matches) => const ProjectDetailPage(),
     ),
     Path(
@@ -76,10 +77,31 @@ class RouteConfiguration {
       final regExpPattern = RegExp(path.pattern);
       if (regExpPattern.hasMatch(settings.name!)) {
         final firstMatch = regExpPattern.firstMatch(settings.name!)!;
-        final match = (firstMatch.groupCount == 1) ? firstMatch.group(1) : null;
+        final match = (firstMatch.groupCount >= 1) ? firstMatch.group(1) : null;
+        
+        // For project detail route, pass the slug in RouteSettings
+        RouteSettings? updatedSettings = settings;
+        if (settings.name!.startsWith(ProjectDetailPage.projectDetailPageRoute)) {
+          // Always set slug if available, even if null (for fallback handling)
+          if (match != null) {
+            updatedSettings = RouteSettings(
+              name: settings.name,
+              arguments: settings.arguments != null 
+                ? {'slug': match, 'originalArguments': settings.arguments}
+                : {'slug': match},
+            );
+          } else if (settings.arguments == null) {
+            // If no match but it's a project detail route, pass empty slug map for fallback
+            updatedSettings = RouteSettings(
+              name: settings.name,
+              arguments: {'slug': null},
+            );
+          }
+        }
+        
         return NoAnimationMaterialPageRoute<void>(
           builder: (context) => path.builder(context, match),
-          settings: settings,
+          settings: updatedSettings,
         );
       }
     }
