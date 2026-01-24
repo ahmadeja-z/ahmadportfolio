@@ -37,20 +37,25 @@ class RouteConfiguration {
   /// will be returned. This means that the paths higher up in the list will
   /// take priority.
   static List<Path> paths = [
+    // Root route - redirect to home
     Path(
-      r'^' + PrivacyPolicyPage.pageRoute,
+      r'^/$',
+      (context, matches) => HomePage(),
+    ),
+    Path(
+      r'^' + PrivacyPolicyPage.pageRoute + r'$',
       (context, matches) => const PrivacyPolicyPage(),
     ),
     Path(
-      r'^' + ContactPage.contactPageRoute,
+      r'^' + ContactPage.contactPageRoute + r'$',
       (context, matches) => const ContactPage(),
     ),
     Path(
-      r'^' + AboutPage.aboutPageRoute,
+      r'^' + AboutPage.aboutPageRoute + r'$',
       (context, matches) => const AboutPage(),
     ),
     Path(
-      r'^' + WorksPage.worksPageRoute,
+      r'^' + WorksPage.worksPageRoute + r'$',
       (context, matches) => const WorksPage(),
     ),
     Path(
@@ -59,33 +64,50 @@ class RouteConfiguration {
       (context, matches) => const ProjectDetailPage(),
     ),
     Path(
-      r'^' + ExperiencePage.experiencePageRoute,
+      r'^' + ExperiencePage.experiencePageRoute + r'$',
       (context, matches) => const ExperiencePage(),
     ),
     Path(
-      r'^' + CertificationPage.certificationPageRoute,
+      r'^' + CertificationPage.certificationPageRoute + r'$',
       (context, matches) => const CertificationPage(),
     ),
     Path(
-      r'^' + HomePage.homePageRoute,
+      r'^' + HomePage.homePageRoute + r'$',
       (context, matches) => HomePage(),
     ),
   ];
 
   static Route<dynamic>? onGenerateRoute(RouteSettings settings) {
+    // Normalize the route name - remove trailing slashes and handle root
+    String routeName = settings.name ?? '/';
+    
+    // Remove trailing slash (except for root)
+    if (routeName.length > 1 && routeName.endsWith('/')) {
+      routeName = routeName.substring(0, routeName.length - 1);
+    }
+    
+    // Handle root route - redirect to home
+    if (routeName == '' || routeName == '/') {
+      return NoAnimationMaterialPageRoute<void>(
+        builder: (context) => HomePage(),
+        settings: RouteSettings(name: HomePage.homePageRoute),
+      );
+    }
+    
+    // Try to match routes
     for (Path path in paths) {
       final regExpPattern = RegExp(path.pattern);
-      if (regExpPattern.hasMatch(settings.name!)) {
-        final firstMatch = regExpPattern.firstMatch(settings.name!)!;
+      if (regExpPattern.hasMatch(routeName)) {
+        final firstMatch = regExpPattern.firstMatch(routeName)!;
         final match = (firstMatch.groupCount >= 1) ? firstMatch.group(1) : null;
         
         // For project detail route, pass the slug in RouteSettings
         RouteSettings? updatedSettings = settings;
-        if (settings.name!.startsWith(ProjectDetailPage.projectDetailPageRoute)) {
+        if (routeName.startsWith(ProjectDetailPage.projectDetailPageRoute)) {
           // Always set slug if available, even if null (for fallback handling)
           if (match != null) {
             updatedSettings = RouteSettings(
-              name: settings.name,
+              name: routeName,
               arguments: settings.arguments != null 
                 ? {'slug': match, 'originalArguments': settings.arguments}
                 : {'slug': match},
@@ -93,10 +115,16 @@ class RouteConfiguration {
           } else if (settings.arguments == null) {
             // If no match but it's a project detail route, pass empty slug map for fallback
             updatedSettings = RouteSettings(
-              name: settings.name,
+              name: routeName,
               arguments: {'slug': null},
             );
           }
+        } else {
+          // Update route name for other routes
+          updatedSettings = RouteSettings(
+            name: routeName,
+            arguments: settings.arguments,
+          );
         }
         
         return NoAnimationMaterialPageRoute<void>(
@@ -105,7 +133,8 @@ class RouteConfiguration {
         );
       }
     }
-    // If no match is found, [WidgetsApp.onUnknownRoute] handles it.
+    
+    // If no match is found, return null to let onUnknownRoute handle it
     return null;
   }
 

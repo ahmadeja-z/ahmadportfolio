@@ -47,6 +47,13 @@ class _AhmadPortfolioState extends State<AhmadPortfolio> {
         debugShowCheckedModeBanner: false,
         initialRoute: HomePage.homePageRoute,
         onGenerateRoute: RouteConfiguration.onGenerateRoute,
+        onUnknownRoute: (settings) {
+          // Handle unknown routes - redirect to home
+          return MaterialPageRoute(
+            builder: (context) => HomePage(),
+            settings: RouteSettings(name: HomePage.homePageRoute),
+          );
+        },
         builder: (context, child) {
           // Image Preloading Initialization
           // ================================
