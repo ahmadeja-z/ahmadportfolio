@@ -15,6 +15,12 @@ import 'configure_web.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Start preloading images IMMEDIATELY when URL is hit
+  // This begins loading before app initialization, so images are ready faster
+  // The preloading happens in the background and doesn't block app startup
+  ImagePreloader.startPreloadingImmediately();
+  
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   configureDependencies();
   configureApp();

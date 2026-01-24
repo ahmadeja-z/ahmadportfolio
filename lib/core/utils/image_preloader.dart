@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:ahmadportfolio/values/values.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -84,42 +86,42 @@ class ImagePreloader {
   static final List<String> allImages = [
     // Profile / Common
     ImagePath.DEV,
-    ImagePath.VYBZ,
-    ImagePath.DAVID,
-    ImagePath.COLOSSAL_TOONS,
-    ImagePath.LOGIN_CATALOG,
-    ImagePath.ONBOARDING_APP,
-    ImagePath.FOODY_BITE,
-    ImagePath.OTP_TEXT_FIELD,
-    ImagePath.FINOPP,
-    ImagePath.BEQUIP_LOGISTICS,
-    ImagePath.LEARN_UPP,
+    // ImagePath.VYBZ,
+    // ImagePath.DAVID,
+    // ImagePath.COLOSSAL_TOONS,
+    // ImagePath.LOGIN_CATALOG,
+    // ImagePath.ONBOARDING_APP,
+    // ImagePath.FOODY_BITE,
+    // ImagePath.OTP_TEXT_FIELD,
+    // ImagePath.FINOPP,
+    // ImagePath.BEQUIP_LOGISTICS,
+    // ImagePath.LEARN_UPP,
     ImagePath.WORKS,
 
     ImagePath.CIRCLE,
-    ImagePath.PLAYSTORE,
+    // ImagePath.PLAYSTORE,
     ImagePath.ARROW_RIGHT,
     ImagePath.ARROW_DOWN,
     ImagePath.ARROW_DOWN_2,
     ImagePath.ARROW_UP,
     ImagePath.ARROW_DOWN_IOS,
-    ImagePath.CAESAR,
-    ImagePath.MEDITATION,
-    ImagePath.ABOUT_PORTRAIT,
-    ImagePath.DEV_ABOUT,
-    ImagePath.DEV_MEDITATE,
+    // ImagePath.CAESAR,
+    // ImagePath.MEDITATION,
+    // ImagePath.ABOUT_PORTRAIT,
+    // ImagePath.DEV_ABOUT,
+    // ImagePath.DEV_MEDITATE,
 
-    ImagePath.DEV_SKILLS,
-    ImagePath.DEV_SKILLS_1,
-    ImagePath.DEV_SKILLS_2,
+    // ImagePath.DEV_SKILLS,
+    // ImagePath.DEV_SKILLS_1,
+    // ImagePath.DEV_SKILLS_2,
     ImagePath.GOOGLE_PLAY,
 
     // Certifications
-    ImagePath.ANDROID_BASICS_CERT,
-    ImagePath.CLOUD_DEVELOPER_CERT,
-    ImagePath.CMU_MASTERS_CERT,
-    ImagePath.ASSOCIATE_ANDROID_DEV,
-    ImagePath.DATA_SCIENCE_CERT,
+    // ImagePath.ANDROID_BASICS_CERT,
+    // ImagePath.CLOUD_DEVELOPER_CERT,
+    // ImagePath.CMU_MASTERS_CERT,
+    // ImagePath.ASSOCIATE_ANDROID_DEV,
+    // ImagePath.DATA_SCIENCE_CERT,
 
     // Fenix Project
     ImagePath.FENIX_MAIN,
@@ -239,6 +241,107 @@ class ImagePreloader {
     ImagePath.POULTRY_6,
     ImagePath.POULTRY_7,
   ];
+
+  /// Starts preloading images immediately when URL is hit (before app initialization).
+  /// 
+  /// **This method starts loading images as soon as the Dart code executes.**
+  /// - Works without BuildContext (can be called in main() before runApp())
+  /// - Uses ImageProvider.resolve() to load images into cache
+  /// - Starts immediately when website URL is accessed
+  /// - Continues loading in background while app initializes
+  /// 
+  /// **When to use:**
+  /// - Call this in main() before runApp() for earliest possible start
+  /// - Images begin loading before MaterialApp is even created
+  /// - Best for web applications where you want immediate loading
+  /// 
+  /// **How it works:**
+  /// - Creates ImageProvider instances for each image
+  /// - Resolves them into Flutter's image cache
+  /// - No BuildContext required (works before app starts)
+  /// - Non-blocking (doesn't delay app startup)
+  static Future<void> startPreloadingImmediately() async {
+    if (kDebugMode) {
+      debugPrint('🚀 Starting immediate image preloading (before app initialization)...');
+      debugPrint('Total images to preload: ${allImages.length}');
+    }
+    
+    try {
+      int successCount = 0;
+      int failureCount = 0;
+      
+      // Start loading images immediately in batches
+      const batchSize = 5;
+      for (int i = 0; i < allImages.length; i += batchSize) {
+        final batch = allImages.skip(i).take(batchSize).toList();
+        
+        // Load batch concurrently
+        await Future.wait(
+          batch.map((imagePath) async {
+            try {
+              final imageProvider = AssetImage(imagePath);
+              // Resolve image into cache (doesn't require BuildContext)
+              final imageStream = imageProvider.resolve(const ImageConfiguration());
+              
+              // Wait for the image to be fully loaded by listening to the stream
+              final completer = Completer<void>();
+              late ImageStreamListener listener;
+              
+              listener = ImageStreamListener(
+                (ImageInfo info, bool synchronousCall) {
+                  if (!completer.isCompleted) {
+                    completer.complete();
+                  }
+                },
+                onError: (exception, stackTrace) {
+                  if (!completer.isCompleted) {
+                    completer.completeError(exception);
+                  }
+                },
+              );
+              
+              imageStream.addListener(listener);
+              
+              try {
+                await completer.future;
+                successCount++;
+                
+                if (kDebugMode && successCount % 10 == 0) {
+                  debugPrint('  ✓ Loaded $successCount/${allImages.length} images...');
+                }
+              } finally {
+                imageStream.removeListener(listener);
+              }
+            } catch (e) {
+              failureCount++;
+              if (kDebugMode) {
+                debugPrint('  ✗ Failed: $imagePath');
+              }
+            }
+          }),
+          eagerError: false, // Continue even if some fail
+        );
+        
+        // Small delay between batches to prevent blocking
+        if (i + batchSize < allImages.length) {
+          await Future.delayed(const Duration(milliseconds: 30));
+        }
+      }
+      
+      if (kDebugMode) {
+        debugPrint('');
+        debugPrint('=== Immediate Preloading Complete ===');
+        debugPrint('Successfully loaded: $successCount/${allImages.length}');
+        debugPrint('Failed: $failureCount');
+        debugPrint('====================================');
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('Error during immediate preloading: $e');
+        debugPrint('App will continue - images will load on-demand');
+      }
+    }
+  }
 
   /// Preloads all images sequentially in the background without blocking the UI.
   /// 
